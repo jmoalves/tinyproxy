@@ -449,7 +449,12 @@ static int load_config_file (const char *config_fname, struct config_s *conf)
         FILE *config_file;
         int ret = -1;
 
-        config_file = fopen (config_fname, "r");
+        if (config_fname[0] == '-' && !config_fname[1]) {
+            config_file = stdin;
+        } else {
+            config_file = fopen (config_fname, "r");
+        }
+
         if (!config_file) {
                 fprintf (stderr,
                          "%s: Could not open config file \"%s\".\n",
@@ -466,8 +471,9 @@ static int load_config_file (const char *config_fname, struct config_s *conf)
         ret = 0;
 
 done:
-        if (config_file)
+        if (config_file && config_file != stdin) {
                 fclose (config_file);
+        }
 
         return ret;
 }
